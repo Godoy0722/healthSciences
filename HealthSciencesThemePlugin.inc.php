@@ -16,7 +16,9 @@
 use APP\core\Application;
 use PKP\config\Config;
 use PKP\facades\Locale;
+use PKP\form\validation\FormValidatorAltcha;
 use PKP\plugins\ThemePlugin;
+use PKP\security\Validation;
 
 class HealthSciencesThemePlugin extends ThemePlugin
 {
@@ -154,6 +156,7 @@ class HealthSciencesThemePlugin extends ThemePlugin
     public function loadTemplateData($hookName, $args)
     {
         $templateMgr = $args[0];
+        $template = $args[1] ?? '';
         $request = Application::get()->getRequest();
         $context = $request->getContext();
 
@@ -176,6 +179,21 @@ class HealthSciencesThemePlugin extends ThemePlugin
                 'loginUrl' => $loginUrl,
                 'brandImage' => 'templates/images/ojs_brand_white.png',
             ]);
+
+            if (str_starts_with($template, 'frontend/') && !Validation::isLoggedIn()) {
+                $this->assignLoginModalAltcha($templateMgr);
+            }
+        }
+    }
+
+    /**
+     * Assign ALTCHA challenge and scripts for the site-wide login modal.
+     */
+    private function assignLoginModalAltcha($templateMgr): void
+    {
+        if (Config::getVar('captcha', 'altcha') && Config::getVar('captcha', 'altcha_on_login')) {
+            FormValidatorAltcha::addAltchaJavascript($templateMgr);
+            FormValidatorAltcha::insertFormChallenge($templateMgr);
         }
     }
 }

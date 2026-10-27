@@ -156,7 +156,6 @@ class HealthSciencesThemePlugin extends ThemePlugin
     public function loadTemplateData($hookName, $args)
     {
         $templateMgr = $args[0];
-        $template = $args[1] ?? '';
         $request = Application::get()->getRequest();
         $context = $request->getContext();
 
@@ -180,7 +179,7 @@ class HealthSciencesThemePlugin extends ThemePlugin
                 'brandImage' => 'templates/images/ojs_brand_white.png',
             ]);
 
-            if (str_starts_with($template, 'frontend/') && !Validation::isLoggedIn()) {
+            if (!Validation::isLoggedIn()) {
                 $this->assignLoginModalAltcha($templateMgr);
             }
         }
